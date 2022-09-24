@@ -1,0 +1,27 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+    plugins {
+        id 'com.android.application' version '7.3.0'
+        id 'com.android.library' version '7.3.0'
+        id 'com.android.test' version '7.3.0'
+        id 'org.jetbrains.kotlin.android' version '1.7.10'
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "cooee-mobile"
+include ':wear'
+include ':core-compose'
+include ':feature-browse'
+include ':feature-tile'
