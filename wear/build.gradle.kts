@@ -102,6 +102,7 @@ dependencies {
     implementation(projects.featureTile)
     implementation(projects.featureBrowse)
     implementation(projects.coreCompose)
+    implementation(projects.cooeeApi)
 
     implementation(libs.startup.runtime)
     implementation(libs.androidx.activity.activity.compose)

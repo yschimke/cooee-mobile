@@ -22,6 +22,7 @@ enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "cooee-mobile"
 include ':wear'
+include ':cooee-api'
 include ':core-compose'
 include ':feature-browse'
 include ':feature-tile'
