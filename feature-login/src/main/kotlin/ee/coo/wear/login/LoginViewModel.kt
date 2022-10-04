@@ -11,49 +11,42 @@
  * limitations under the License.
  */
 
-package ee.coo.wear.browse
-
+package ee.coo.wear.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.baulsupp.cooee.p.CommandRequest
-import com.baulsupp.cooee.p.CommandResponse
-import com.google.api.services.drive.Drive
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ee.coo.wear.api.CooeeApiRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BrowseViewModel @Inject constructor(
-    val cooeeApiRepository: CooeeApiRepository,
+class LoginViewModel @Inject constructor(
+    val authRepository: AuthRepository
 ) : ViewModel() {
-    val state = MutableStateFlow(BrowseScreenState())
 
-    fun makeRequest() {
-        viewModelScope.launch {
-            cooeeApiRepository.requestStream<CommandRequest, CommandResponse>(
-                "runCommand",
-                CommandRequest(parsed_command = listOf("hello"))
-            )
-        }
-    }
+    val launcherContract = GoogleSignInContract(authRepository.googleApiClient)
 
-    fun makeGoogleRequest() {
-        viewModelScope.launch {
-        }
-    }
+    val state = authRepository.state.map {
+        LoginScreenState(it)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = LoginScreenState(authRepository.state.value)
+    )
 
-    fun validate() {
+    fun updateAccount(account: GoogleSignInAccount?) {
         viewModelScope.launch {
-            cooeeApiRepository.validate()
+            authRepository.updateAccount(account)
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            cooeeApiRepository.validate()
+            authRepository.logout()
         }
     }
 }

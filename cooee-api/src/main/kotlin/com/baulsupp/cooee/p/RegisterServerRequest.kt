@@ -25,7 +25,6 @@ import okio.ByteString
 
 public class RegisterServerRequest(
   commands: List<String> = emptyList(),
-  values: List<String> = emptyList(),
   unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<RegisterServerRequest, RegisterServerRequest.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
@@ -36,18 +35,9 @@ public class RegisterServerRequest(
   @JvmField
   public val commands: List<String> = immutableCopyOf("commands", commands)
 
-  @field:WireField(
-    tag = 2,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.REPEATED,
-  )
-  @JvmField
-  public val values: List<String> = immutableCopyOf("values", values)
-
   public override fun newBuilder(): Builder {
     val builder = Builder()
     builder.commands = commands
-    builder.values = values
     builder.addUnknownFields(unknownFields)
     return builder
   }
@@ -57,7 +47,6 @@ public class RegisterServerRequest(
     if (other !is RegisterServerRequest) return false
     if (unknownFields != other.unknownFields) return false
     if (commands != other.commands) return false
-    if (values != other.values) return false
     return true
   }
 
@@ -66,7 +55,6 @@ public class RegisterServerRequest(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + commands.hashCode()
-      result = result * 37 + values.hashCode()
       super.hashCode = result
     }
     return result
@@ -75,22 +63,15 @@ public class RegisterServerRequest(
   public override fun toString(): String {
     val result = mutableListOf<String>()
     if (commands.isNotEmpty()) result += """commands=${sanitize(commands)}"""
-    if (values.isNotEmpty()) result += """values=${sanitize(values)}"""
     return result.joinToString(prefix = "RegisterServerRequest{", separator = ", ", postfix = "}")
   }
 
-  public fun copy(
-    commands: List<String> = this.commands,
-    values: List<String> = this.values,
-    unknownFields: ByteString = this.unknownFields,
-  ): RegisterServerRequest = RegisterServerRequest(commands, values, unknownFields)
+  public fun copy(commands: List<String> = this.commands, unknownFields: ByteString =
+      this.unknownFields): RegisterServerRequest = RegisterServerRequest(commands, unknownFields)
 
   public class Builder : Message.Builder<RegisterServerRequest, Builder>() {
     @JvmField
     public var commands: List<String> = emptyList()
-
-    @JvmField
-    public var values: List<String> = emptyList()
 
     public fun commands(commands: List<String>): Builder {
       checkElementsNotNull(commands)
@@ -98,15 +79,8 @@ public class RegisterServerRequest(
       return this
     }
 
-    public fun values(values: List<String>): Builder {
-      checkElementsNotNull(values)
-      this.values = values
-      return this
-    }
-
     public override fun build(): RegisterServerRequest = RegisterServerRequest(
       commands = commands,
-      values = values,
       unknownFields = buildUnknownFields()
     )
   }
@@ -125,35 +99,29 @@ public class RegisterServerRequest(
       public override fun encodedSize(`value`: RegisterServerRequest): Int {
         var size = value.unknownFields.size
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.commands)
-        size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(2, value.values)
         return size
       }
 
       public override fun encode(writer: ProtoWriter, `value`: RegisterServerRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
-        ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.values)
         writer.writeBytes(value.unknownFields)
       }
 
       public override fun encode(writer: ReverseProtoWriter, `value`: RegisterServerRequest): Unit {
         writer.writeBytes(value.unknownFields)
-        ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.values)
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
       }
 
       public override fun decode(reader: ProtoReader): RegisterServerRequest {
         val commands = mutableListOf<String>()
-        val values = mutableListOf<String>()
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> commands.add(ProtoAdapter.STRING.decode(reader))
-            2 -> values.add(ProtoAdapter.STRING.decode(reader))
             else -> reader.readUnknownField(tag)
           }
         }
         return RegisterServerRequest(
           commands = commands,
-          values = values,
           unknownFields = unknownFields
         )
       }

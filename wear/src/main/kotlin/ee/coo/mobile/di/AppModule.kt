@@ -29,16 +29,23 @@ import com.google.android.horologist.networks.rules.NetworkingRules
 import com.google.android.horologist.networks.rules.NetworkingRulesEngine
 import com.google.android.horologist.networks.status.NetworkRepository
 import com.google.android.horologist.networks.status.NetworkRepositoryImpl
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ee.coo.mobile.BuildConfig
+import ee.coo.wear.api.TokenAccess
+import ee.coo.wear.login.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.Call
 import okhttp3.OkHttpClient
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -69,7 +76,8 @@ object AppModule {
     fun highBandwidthRequester(
         connectivityManager: ConnectivityManager,
         networkRepository: NetworkRepository,
-    ): HighBandwidthNetworkMediator = SimpleHighBandwidthNetworkMediator(connectivityManager, networkRepository)
+    ): HighBandwidthNetworkMediator =
+        SimpleHighBandwidthNetworkMediator(connectivityManager, networkRepository)
 
     @Singleton
     @Provides
@@ -110,7 +118,12 @@ object AppModule {
     fun provideDefaultOkHttpClient(): OkHttpClient =
         OkHttpClient.Builder()
             .followSslRedirects(false)
-            .addInterceptor(AlwaysHttpsInterceptor)
+            .apply {
+
+                if (!BuildConfig.DEBUG) {
+                    addInterceptor(AlwaysHttpsInterceptor)
+                }
+            }
             .build()
 
     @Singleton
@@ -143,4 +156,20 @@ object AppModule {
         logger = appEventLogger,
         networkingRules = networkingRules
     )
+
+    @Singleton
+    @Provides
+    fun moshi(
+    ): Moshi = Moshi.Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build()
+
+    @Singleton
+    @Provides
+    fun tokenAccess(authRepository: Provider<AuthRepository>): TokenAccess {
+        return object : TokenAccess {
+            override val idToken: String?
+                get() = authRepository.get().idToken
+        }
+    }
 }

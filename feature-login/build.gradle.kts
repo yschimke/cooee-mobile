@@ -10,7 +10,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        namespace = "ee.coo.mobile.wear.browse"
+        namespace = "ee.coo.mobile.wear.login"
         minSdk = 26
         targetSdk = 33
     }
@@ -57,7 +57,7 @@ dependencies {
     implementation(libs.horologist.compose.layout)
     implementation(libs.horologist.compose.tools)
     implementation(libs.com.google.dagger.hilt.android)
-    implementation("io.rsocket.kotlin:rsocket-core-jvm:0.15.4")
-    implementation("com.google.api-client:google-api-client:2.0.0")
-    implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0")
+    implementation(libs.kotlinx.coroutines.playservices)
+    implementation(libs.playservices.auth)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha02")
 }

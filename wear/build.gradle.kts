@@ -86,6 +86,7 @@ android {
         resources.excludes.add("META-INF/licenses/**")
         resources.excludes.add("META-INF/AL2.0")
         resources.excludes.add("META-INF/LGPL2.1")
+        resources.excludes.add("META-INF/DEPENDENCIES")
     }
 }
 
@@ -101,6 +102,7 @@ dependencies {
 
     implementation(projects.featureTile)
     implementation(projects.featureBrowse)
+    implementation(projects.featureLogin)
     implementation(projects.coreCompose)
     implementation(projects.cooeeApi)
 
@@ -139,6 +141,10 @@ dependencies {
     implementation(libs.horologist.network.awareness)
     implementation(libs.androidx.metrics.performance)
     implementation(libs.horologist.compose.tools)
+    implementation("com.squareup.moshi:moshi-adapters:1.14.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha02")
 
     debugImplementation(libs.androidx.compose.ui.ui.tooling)
 

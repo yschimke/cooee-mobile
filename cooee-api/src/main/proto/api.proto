@@ -124,9 +124,17 @@ message Table {
 
 message RegisterServerRequest {
   repeated string commands = 1;
-  repeated string values = 2;
 }
 
 message RegisterServerResponse {
   string uuid = 1;
+}
+
+message GoogleTokenExchangeRequest {
+  string idToken = 1;
+  optional string authCode = 2;
+}
+
+message GoogleTokenExchangeResponse {
+  optional string bearerToken = 1;
 }

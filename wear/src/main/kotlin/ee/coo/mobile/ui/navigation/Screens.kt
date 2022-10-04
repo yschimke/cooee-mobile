@@ -18,4 +18,6 @@ package ee.coo.mobile.ui.navigation
 
 sealed class Screens(val route: String) {
     object Home : Screens("home")
+
+    object Login : Screens("login")
 }

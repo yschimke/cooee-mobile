@@ -12,6 +12,6 @@
   -->
 
 <resources>
-    <string name="app_name">Network Status</string>
-    <string name="title_activity_status">StatusActivity</string>
+    <string name="app_name">Cooee</string>
+    <string name="title_activity_status">Cooee</string>
 </resources>

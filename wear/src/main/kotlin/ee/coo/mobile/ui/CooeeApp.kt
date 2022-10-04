@@ -11,14 +11,18 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalHorologistNetworksApi::class)
+@file:OptIn(ExperimentalLifecycleComposeApi::class)
 
 package ee.coo.mobile.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.ScalingLazyListState
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
@@ -26,11 +30,15 @@ import com.google.android.horologist.compose.navscaffold.scalingLazyColumnCompos
 import com.google.android.horologist.networks.ExperimentalHorologistNetworksApi
 import ee.coo.mobile.ui.navigation.Screens
 import ee.coo.wear.browse.BrowseScreen
+import ee.coo.wear.login.LoginScreen
 
 @Composable
 fun CooeeApp(
     navController: NavHostController,
+    viewModel: AppViewModel = hiltViewModel()
 ) {
+    val appState by viewModel.state.collectAsStateWithLifecycle()
+
     WearNavScaffold(
         startDestination = Screens.Home.route,
         navController = navController,
@@ -44,8 +52,28 @@ fun CooeeApp(
                 viewModel = hiltViewModel(),
                 focusRequester = it.viewModel.focusRequester,
                 scrollState = it.scrollableState,
+                navController = navController,
+                onAuth = { navController.navigate(Screens.Login.route) }
+            )
+        }
+
+        scalingLazyColumnComposable(
+            route = Screens.Login.route,
+            scrollStateBuilder = { ScalingLazyListState(initialCenterItemIndex = 0) }
+        ) {
+            LoginScreen(
+                modifier = Modifier.fillMaxSize(),
+                viewModel = hiltViewModel(),
+                focusRequester = it.viewModel.focusRequester,
+                scrollState = it.scrollableState,
                 navController = navController
             )
+        }
+    }
+
+    LaunchedEffect(appState.account) {
+        if (appState.account == null) {
+            navController.navigate(Screens.Login.route)
         }
     }
 }

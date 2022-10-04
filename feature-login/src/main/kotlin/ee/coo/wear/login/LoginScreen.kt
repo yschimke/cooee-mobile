@@ -11,16 +11,20 @@
  * limitations under the License.
  */
 
-package ee.coo.wear.browse
+@file:OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalLifecycleComposeApi::class)
 
+package ee.coo.wear.login
+
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.material.AutoCenteringParams
 import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
@@ -29,69 +33,68 @@ import com.google.android.horologist.compose.navscaffold.scrollableColumn
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
-fun BrowseScreen(
+fun LoginScreen(
     scrollState: ScalingLazyListState,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
-    viewModel: BrowseViewModel,
+    viewModel: LoginViewModel,
     navController: NavController,
-    onAuth: (() -> Unit)?
 ) {
-    val state by rememberStateWithLifecycle(viewModel.state)
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val signInRequestLauncher = rememberLauncherForActivityResult(
+        contract = viewModel.launcherContract
+    ) {
+        viewModel.updateAccount(it)
+    }
 
-    BrowseScreen(
+    LoginScreen(
         scrollState = scrollState,
         focusRequester = focusRequester,
         modifier = modifier,
         state = state,
-        onValidate = { viewModel.validate() },
-        onAuth = onAuth,
-        makeRequest = {
-            viewModel.makeRequest()
+        onClick = {
+            signInRequestLauncher.launch(Unit)
         },
-        makeGoogleRequest = {
-            viewModel.makeGoogleRequest()
+        logoutClick = {
+            viewModel.logout()
         }
     )
 }
 
 @Composable
-fun BrowseScreen(
+fun LoginScreen(
     scrollState: ScalingLazyListState,
     focusRequester: FocusRequester,
-    state: BrowseScreenState,
+    state: LoginScreenState,
     modifier: Modifier = Modifier,
-    onValidate: () -> Unit,
-    makeRequest: () -> Unit,
-    makeGoogleRequest: () -> Unit,
-    onAuth: (() -> Unit)?
+    onClick: () -> Unit,
+    logoutClick: () -> Unit
 ) {
     ScalingLazyColumn(
         modifier = modifier
             .scrollableColumn(focusRequester, scrollState),
         state = scrollState,
-        autoCentering = AutoCenteringParams(itemIndex = 0)
     ) {
-        item {
-            Chip(onClick = onValidate, label = {
-                Text("Validate")
-            })
-        }
-        item {
-            Chip(onClick = makeRequest, label = {
-                Text("Make Request")
-            })
-        }
-        item {
-            Chip(onClick = makeGoogleRequest, label = {
-                Text("Google Request")
-            })
-        }
-        if (onAuth != null) {
+        if (state.account != null) {
             item {
-                Chip(onClick = onAuth, label = {
-                    Text("Auth")
-                })
+                Text("${state.account.displayName}")
+            }
+            item {
+                Text("${state.account.id}")
+            }
+            item {
+                Text("${state.account.grantedScopes.joinToString(", ")}")
+            }
+            item {
+                Button(onClick = logoutClick) {
+                    Text("Logout")
+                }
+            }
+        } else {
+            item {
+                Button(onClick = onClick) {
+                    Text("Login")
+                }
             }
         }
     }
